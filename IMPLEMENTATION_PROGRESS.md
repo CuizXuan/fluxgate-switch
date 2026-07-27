@@ -20,8 +20,16 @@
 - Not Done: Commit, push, tag, signed updater ZIP, `latest.json`, GitHub Release, and published updater verification.
 - Next: Finish the companion APK patch, then publish and verify all repositories together.
 
+## Latest Update - 2026-07-28 01:39
+- Scope: Publish and verify v3.18.1.
+- Completed: Pushed commit `e82f5f4`, tagged `v3.18.1`, and published the signed Windows updater release.
+- Validation: Frontend and Linux/macOS/Windows CI passed; the 33-minute release workflow passed; all four assets downloaded successfully; installer version resources are 3.18.1; `latest.json` points to the v3.18.1 updater; its signature equals the `.sig` asset and the updater ZIP passed cryptographic Minisign verification with the configured public key.
+- Problems / Blockers: None.
+- Not Done: None for v3.18.1.
+- Next: Monitor updater adoption and keep the FluxGateAI preset regression test aligned with the production model catalog.
+
 ## Open Issues
 - [x] Default Codex model is `gpt-5.4-mini`.
 - [x] Release notes and fallback updater links resolve to GitHub Releases.
 - [x] Local v3.18.1 NSIS installer builds successfully.
-- [ ] Publish and verify the signed updater ZIP, installer, and `latest.json`.
+- [x] Publish and verify the signed updater ZIP, installer, and `latest.json`.
