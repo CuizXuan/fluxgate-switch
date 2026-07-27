@@ -1,0 +1,97 @@
+name: Release Windows
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.12.3
+          run_install: false
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Verify source
+        run: |
+          pnpm typecheck
+          pnpm exec vitest run --testTimeout=60000 --hookTimeout=60000 --maxWorkers=1 --minWorkers=1
+          cargo test --release --manifest-path src-tauri/Cargo.toml -- --test-threads=1
+
+      - name: Build unsigned NSIS installer
+        shell: pwsh
+        run: pnpm tauri build --bundles nsis
+
+      - name: Assemble release assets
+        shell: pwsh
+        env:
+          TAURI_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_PRIVATE_KEY_PASSWORD: ""
+        run: |
+          $ErrorActionPreference = "Stop"
+          $version = "${{ github.ref_name }}".TrimStart("v")
+          $bundle = "src-tauri/target/release/bundle/nsis"
+          $installer = Get-ChildItem $bundle -Filter "*-setup.exe" | Select-Object -First 1
+          if (-not $installer) { throw "NSIS installer was not generated" }
+
+          New-Item -ItemType Directory -Force release-assets | Out-Null
+          $installerName = "FluxGate-Switch_${version}_x64-setup.exe"
+          $updaterName = "FluxGate-Switch_${version}_x64.nsis.zip"
+          Copy-Item $installer.FullName "release-assets/$installerName"
+          Compress-Archive -Path $installer.FullName -DestinationPath "release-assets/$updaterName" -Force
+          pnpm tauri signer sign --password= "release-assets/$updaterName"
+          if ($LASTEXITCODE -ne 0) { throw "Tauri updater signing failed" }
+          if (-not (Test-Path "release-assets/$updaterName.sig")) { throw "Updater signature was not generated" }
+
+          $signature = (Get-Content "release-assets/$updaterName.sig" -Raw).Trim()
+          $latest = [ordered]@{
+            version = $version
+            notes = "FluxGate Switch ${{ github.ref_name }}"
+            pub_date = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
+            platforms = [ordered]@{
+              "windows-x86_64" = [ordered]@{
+                signature = $signature
+                url = "https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/$updaterName"
+              }
+            }
+          }
+          $latest | ConvertTo-Json -Depth 6 | Set-Content release-assets/latest.json -Encoding utf8
+
+          $authenticode = Get-AuthenticodeSignature "release-assets/$installerName"
+          if ($authenticode.Status -ne "NotSigned") {
+            throw "Installer unexpectedly has Authenticode status $($authenticode.Status)"
+          }
+          Get-ChildItem release-assets | Format-Table Name,Length
+
+      - name: Publish GitHub Release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${{ github.ref_name }}" release-assets/* `
+            --title "FluxGate Switch ${{ github.ref_name }}" `
+            --notes "Community derivative of CC Switch v3.18.0. Windows NSIS installer is intentionally not Authenticode-signed. Automatic updater artifacts are signed with the FluxGate Tauri updater key."

@@ -1,0 +1,18 @@
+FluxGate Switch
+Copyright (c) 2026 CuizXuan
+
+This repository is a community-maintained derivative of CC Switch v3.18.0:
+https://github.com/farion1231/cc-switch
+
+CC Switch is Copyright (c) 2025 Jason Young and is licensed under the MIT
+License. The complete upstream license is retained in LICENSE. Upstream author
+attribution, documentation and changelog are retained in this source tree.
+
+FluxGate Switch is not an official upstream CC Switch product and is not
+endorsed by the upstream project. The FluxGate branding, application icon,
+release automation, updater key and distribution endpoints are downstream
+changes. Public release artifacts are provided without charge through GitHub
+Releases and are not offered for secondary commercialization.
+
+Windows installer executables are not Authenticode-signed. Tauri updater
+archives carry a separate cryptographic signature used only by the updater.

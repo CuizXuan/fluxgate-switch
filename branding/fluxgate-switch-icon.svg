@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-labelledby="title desc">
+  <title id="title">FluxGate Switch</title>
+  <desc id="desc">A teal gateway mark with a white switching path.</desc>
+  <rect width="1024" height="1024" rx="224" fill="#101820"/>
+  <path d="M216 232h592v152H368v496H216z" fill="#19c6b3"/>
+  <path d="M456 472h352v152H456z" fill="#f4f7f8"/>
+  <path d="m684 408 164 140-164 140z" fill="#f4f7f8"/>
+  <circle cx="292" cy="308" r="42" fill="#f4f7f8"/>
+</svg>
