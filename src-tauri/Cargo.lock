@@ -1587,7 +1587,7 @@ dependencies = [
 
 [[package]]
 name = "fluxgate-switch"
-version = "3.18.0"
+version = "3.18.1"
 dependencies = [
  "anyhow",
  "arboard",

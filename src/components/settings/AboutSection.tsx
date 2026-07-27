@@ -437,13 +437,13 @@ export function AboutSection({ isPortable }: AboutSectionProps) {
 
       if (!displayVersion) {
         await settingsApi.openExternal(
-          "https://api.fluxapi.cloud/downloads",
+          "https://github.com/CuizXuan/fluxgate-switch/releases/latest",
         );
         return;
       }
 
       await settingsApi.openExternal(
-        `https://api.fluxapi.cloud/downloads`,
+        `https://github.com/CuizXuan/fluxgate-switch/releases/tag/${displayVersion}`,
       );
     } catch (error) {
       console.error("[AboutSection] Failed to open release notes", error);
@@ -867,7 +867,9 @@ export function AboutSection({ isPortable }: AboutSectionProps) {
               type="button"
               variant="outline"
               size="sm"
-              onClick={() => settingsApi.openExternal("https://api.fluxapi.cloud")}
+              onClick={() =>
+                settingsApi.openExternal("https://api.fluxapi.cloud")
+              }
               className="h-8 gap-1.5 text-xs"
             >
               <Globe className="h-3.5 w-3.5" />

@@ -132,7 +132,7 @@ export const codexProviderPresets: CodexProviderPreset[] = [
     category: "aggregator",
     auth: generateThirdPartyAuth(""),
     config: `model_provider = "fluxgate"
-model = "gpt-5-codex"
+model = "gpt-5.4-mini"
 preferred_auth_method = "apikey"
 disable_response_storage = true
 
